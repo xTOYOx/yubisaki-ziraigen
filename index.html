@@ -247,6 +247,27 @@ body.phone .howto svg{max-height:96px}
 body.phone .howto h3{font-size:16px}
 body.phone .howto p{font-size:12px;line-height:1.55}
 body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
+
+/* ======== 生還：UI の枠は出さず、盤の上に文字だけを静かに重ねる ======== */
+.survive{position:absolute;inset:0;z-index:3;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:calc(22px + env(safe-area-inset-top,0px)) 16px calc(22px + env(safe-area-inset-bottom,0px));background:linear-gradient(to bottom,rgba(6,5,4,.55),rgba(6,5,4,0) 26%,rgba(6,5,4,0) 74%,rgba(6,5,4,.6))}
+.sv-head{text-align:center;opacity:0;transform:translateY(10px);transition:opacity 1.6s ease,transform 1.6s ease}
+.survive.s1 .sv-head{opacity:1;transform:none}
+.sv-kicker{margin:0;font:500 12px var(--mono);letter-spacing:.42em;color:#cfc6ae;text-transform:uppercase}
+.sv-title{margin:2px 0 0;font:400 clamp(54px,9vw,112px)/1 var(--display);letter-spacing:.32em;padding-left:.32em;color:#f1e8d4;text-shadow:0 2px 24px rgba(0,0,0,.65)}
+.sv-stats{margin:10px 0 0;font:500 13px var(--mono);letter-spacing:.12em;color:#d9d1bc;text-shadow:0 1px 8px rgba(0,0,0,.8)}
+.sv-stats em{font-style:normal;margin-left:10px;color:var(--signal)}
+.sv-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;opacity:0;transition:opacity 1.2s ease}
+.survive.s2 .sv-actions{opacity:1;pointer-events:auto}
+.sv-actions button{background:rgba(6,6,4,.35);border:1px solid rgba(241,232,212,.35);color:#f1e8d4;border-radius:999px;padding:11px 20px;font:500 14px var(--body);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.sv-actions button:hover{background:rgba(241,232,212,.12)}
+.sv-actions kbd{margin-left:8px;opacity:.6;background:none;border-color:rgba(241,232,212,.3);color:inherit}
+.sv-x{background:#f1e8d4 !important;color:#14110c !important;border-color:#f1e8d4 !important;font-weight:700 !important}
+.x-logo{font-size:16px;margin-right:6px}
+.sv-note{position:absolute;left:50%;bottom:calc(76px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);margin:0;font-size:12px;color:#d9d1bc;text-align:center;max-width:90%;text-shadow:0 1px 6px rgba(0,0,0,.8)}
+body.surviving .hudbar,body.surviving .topbar,body.surviving .fab{opacity:0 !important;pointer-events:none !important}
+body.noui .survive{display:none}
+body.phone .sv-title{font-size:48px}
+body.phone .sv-actions button{padding:9px 14px;font-size:13px}
 </style>
 
 <div class="stage" id="stage" tabindex="0" aria-label="地雷原。キーボードの物理キーで操作します">
@@ -275,22 +296,18 @@ body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
     </div>
     <div class="stam" id="stam"><span data-i18n="hud_stam">体力</span><span class="stam-bar"><span id="stam-fill"></span></span><b id="stam-num">100</b><small id="stam-rate"></small></div>
   </div>
-  <section class="result glass" id="result" hidden aria-label="結果" aria-live="polite">
-    <p class="res-kicker">CLEAR</p>
-    <h2 class="res-title" data-i18n="res_title">国境を越えた</h2>
-    <p class="res-sub" id="res-sub"></p>
-    <div class="res-time"><span data-i18n="res_time">タイム</span><b id="res-time">0.0</b><small data-i18n="res_sec">秒</small><em id="res-best" hidden data-i18n="res_best">最速記録</em></div>
-    <dl class="res-grid">
-      <div><dt data-i18n="res_steps">歩数</dt><dd id="res-steps"></dd></div>
-      <div><dt data-i18n="res_stam">残りの体力</dt><dd id="res-stam"></dd></div>
-      <div><dt data-i18n="res_defuse">解除した地雷</dt><dd id="res-defuse"></dd></div>
-      <div><dt data-i18n="res_flags">正しく立てた旗</dt><dd id="res-flags"></dd></div>
-      <div><dt data-i18n="res_prev">これまでの最速</dt><dd id="res-prev"></dd></div>
-    </dl>
-    <div class="res-actions">
-      <button type="button" class="play" id="res-again"><span data-i18n="res_again">もう一度</span><kbd class="kbd-only">Space</kbd></button>
-      <button type="button" id="res-title"><span data-i18n="res_totitle">タイトルへ</span><kbd class="kbd-only">Esc</kbd></button>
+  <section class="survive" id="survive" hidden aria-live="polite">
+    <div class="sv-head">
+      <p class="sv-kicker" data-i18n="sv_sub">生還者の軌跡</p>
+      <h2 class="sv-title" data-i18n="sv_title">生還</h2>
+      <p class="sv-stats"><span id="sv-stats"></span><em id="sv-best" hidden data-i18n="sv_best">最速記録</em></p>
     </div>
+    <div class="sv-actions">
+      <button type="button" class="sv-x" id="sv-share"><span class="x-logo" aria-hidden="true">𝕏</span><span data-i18n="sv_share">で共有</span></button>
+      <button type="button" id="sv-again"><span data-i18n="res_again">もう一度</span><kbd class="kbd-only">Space</kbd></button>
+      <button type="button" id="sv-title"><span data-i18n="res_totitle">タイトルへ</span><kbd class="kbd-only">Esc</kbd></button>
+    </div>
+    <p class="sv-note" id="sv-note" hidden></p>
   </section>
   <button type="button" class="ui-back" id="btn-uiback">UI</button>
   <!-- スマホ用：メニュー（隅のボタンから開く）、旗の切り替え、やり直し、指の当たった場所の印 -->
@@ -492,6 +509,7 @@ body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
   const LANGS = [["ja", "日本語"], ["en", "English"], ["es", "Español"], ["pt", "Português"], ["fr", "Français"], ["de", "Deutsch"]];
   const I18N = {
     ja: {
+      sv_title: "生還", sv_sub: "生還者の軌跡", sv_stats: "{t} 秒 ・ {n} 歩 ・ 地雷 {m}（{lv}）", sv_best: "最速記録", sv_share: "で共有", share_text: "指先の地雷原。{t} 秒・{n} 歩で地雷原を渡りきり、生還した。（地雷 {m}・{lv}）\n#指先の地雷原", share_saved: "画像を保存しました。開いた X の投稿画面に、その画像を添付してください。", share_title: "指先の地雷原",
       doc_title: "指先の地雷原", h1: "指先の地雷原", lead: "キーボードは地雷原。2 本の指で、国境まで歩いて渡る。",
       play: "プレイする", lv_easy: "少なめ", lv_normal: "普通", lv_hard: "多め", lv_extreme: "とても多い", lv_custom: "調整",
       best_label: "この地雷の数での最速", note_phones: "ヘッドホン推奨。地雷の場所は音だけが頼りです。", sec_howto: "遊び方",
@@ -562,6 +580,7 @@ body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
       gen_less: "地雷 {want} 個では条件を満たす盤が作れなかったので、{n} 個にしました", gen_belt: "この地雷の数では帯を置ききれなかったので、帯を減らしました",
     },
     en: {
+      sv_title: "SURVIVED", sv_sub: "A survivor’s trail", sv_stats: "{t} s · {n} steps · {m} mines ({lv})", sv_best: "New best", sv_share: "Share on X", share_text: "I crossed the minefield alive in Fingertip Minefield — {t} s, {n} steps ({m} mines, {lv}).\n#FingertipMinefield", share_saved: "The image was saved. Attach it to the X post that just opened.", share_title: "Fingertip Minefield",
       doc_title: "Fingertip Minefield", h1: "Fingertip Minefield", lead: "Your keyboard is a minefield. Walk to the border on two fingers.",
       play: "Play", lv_easy: "Few", lv_normal: "Normal", lv_hard: "Many", lv_extreme: "Very many", lv_custom: "Custom",
       best_label: "Best time with this many mines", note_phones: "Headphones recommended — sound is your only clue to where the mines are.", sec_howto: "How to play",
@@ -632,6 +651,7 @@ body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
       gen_less: "A valid board couldn't be made with {want} mines, so {n} were placed", gen_belt: "Not all belts fit with this many mines, so fewer were placed",
     },
     es: {
+      sv_title: "SOBREVIVISTE", sv_sub: "El rastro de un superviviente", sv_stats: "{t} s · {n} pasos · {m} minas ({lv})", sv_best: "Nuevo récord", sv_share: "Compartir en X", share_text: "Crucé el campo minado con vida en Campo minado bajo los dedos: {t} s y {n} pasos ({m} minas, {lv}).\n#FingertipMinefield", share_saved: "Se guardó la imagen. Adjúntala a la publicación de X que se acaba de abrir.", share_title: "Campo minado bajo los dedos",
       doc_title: "Campo minado bajo los dedos", h1: "Campo minado bajo los dedos", lead: "Tu teclado es un campo minado. Cruza hasta la frontera caminando con dos dedos.",
       play: "Jugar", lv_easy: "Pocas", lv_normal: "Normal", lv_hard: "Muchas", lv_extreme: "Muchísimas", lv_custom: "Personalizado",
       best_label: "Mejor tiempo con estas minas", note_phones: "Se recomiendan auriculares: el sonido es tu única pista sobre dónde están las minas.", sec_howto: "Cómo se juega",
@@ -702,6 +722,7 @@ body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
       gen_less: "No se pudo crear un tablero válido con {want} minas, así que se colocaron {n}", gen_belt: "No cabían todas las franjas con tantas minas, así que se colocaron menos",
     },
     pt: {
+      sv_title: "SOBREVIVEU", sv_sub: "O rastro de um sobrevivente", sv_stats: "{t} s · {n} passos · {m} minas ({lv})", sv_best: "Novo recorde", sv_share: "Compartilhar no X", share_text: "Atravessei o campo minado com vida em Campo minado na ponta dos dedos: {t} s e {n} passos ({m} minas, {lv}).\n#FingertipMinefield", share_saved: "A imagem foi salva. Anexe-a ao post do X que acabou de abrir.", share_title: "Campo minado na ponta dos dedos",
       doc_title: "Campo minado na ponta dos dedos", h1: "Campo minado na ponta dos dedos", lead: "Seu teclado é um campo minado. Atravesse até a fronteira andando com dois dedos.",
       play: "Jogar", lv_easy: "Poucas", lv_normal: "Normal", lv_hard: "Muitas", lv_extreme: "Muitíssimas", lv_custom: "Personalizado",
       best_label: "Melhor tempo com estas minas", note_phones: "Recomenda-se usar fones de ouvido: o som é sua única pista de onde estão as minas.", sec_howto: "Como jogar",
@@ -772,6 +793,7 @@ body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
       gen_less: "Não foi possível montar um tabuleiro válido com {want} minas, então foram colocadas {n}", gen_belt: "Nem todas as faixas couberam com tantas minas, então foram colocadas menos",
     },
     fr: {
+      sv_title: "SURVIVANT", sv_sub: "La trace d’un survivant", sv_stats: "{t} s · {n} pas · {m} mines ({lv})", sv_best: "Nouveau record", sv_share: "Partager sur X", share_text: "J’ai traversé le champ de mines vivant dans Champ de mines du bout des doigts : {t} s, {n} pas ({m} mines, {lv}).\n#FingertipMinefield", share_saved: "L’image a été enregistrée. Joignez-la au post X qui vient de s’ouvrir.", share_title: "Champ de mines du bout des doigts",
       doc_title: "Champ de mines du bout des doigts", h1: "Champ de mines du bout des doigts", lead: "Votre clavier est un champ de mines. Traversez jusqu’à la frontière en marchant sur deux doigts.",
       play: "Jouer", lv_easy: "Peu", lv_normal: "Normal", lv_hard: "Beaucoup", lv_extreme: "Énormément", lv_custom: "Personnalisé",
       best_label: "Meilleur temps avec ce nombre de mines", note_phones: "Casque recommandé : le son est votre seul indice sur l’emplacement des mines.", sec_howto: "Comment jouer",
@@ -842,6 +864,7 @@ body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
       gen_less: "Impossible de créer un plateau valide avec {want} mines : {n} ont été placées", gen_belt: "Toutes les bandes ne tenaient pas avec autant de mines : il y en a moins",
     },
     de: {
+      sv_title: "ÜBERLEBT", sv_sub: "Die Spur eines Überlebenden", sv_stats: "{t} s · {n} Schritte · {m} Minen ({lv})", sv_best: "Neue Bestzeit", sv_share: "Auf X teilen", share_text: "Lebend durchs Minenfeld in Minenfeld unter den Fingerspitzen – {t} s, {n} Schritte ({m} Minen, {lv}).\n#FingertipMinefield", share_saved: "Das Bild wurde gespeichert. Hänge es an den X-Beitrag an, der sich gerade geöffnet hat.", share_title: "Minenfeld unter den Fingerspitzen",
       doc_title: "Minenfeld unter den Fingerspitzen", h1: "Minenfeld unter den Fingerspitzen", lead: "Deine Tastatur ist ein Minenfeld. Geh auf zwei Fingern bis zur Grenze.",
       play: "Spielen", lv_easy: "Wenige", lv_normal: "Normal", lv_hard: "Viele", lv_extreme: "Sehr viele", lv_custom: "Eigene",
       best_label: "Bestzeit mit dieser Minenzahl", note_phones: "Kopfhörer empfohlen – der Klang ist dein einziger Hinweis, wo die Minen liegen.", sec_howto: "So wird gespielt",
@@ -915,7 +938,7 @@ body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
   let LANG = (() => {
     // 自分で選んだ言語だけを覚える（前の版が端末の言語を自動で保存していた "ykj-lang" は使わない）
     try { const s = localStorage.getItem("ykj-lang-picked"); if (s && I18N[s]) return s; } catch (e) {}
-    return "en";   // はじめて開いたときは英語
+    return "ja";   // はじめて開いたときは日本語
   })();
   function t(key, p) {
     let s = I18N[LANG][key]; if (s == null) s = I18N.ja[key]; if (s == null) return key;
@@ -2449,7 +2472,45 @@ body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
       }
       camera.setViewOffset(w, hv, 0, oy - top, w, h);
       camera.updateProjectionMatrix();
+      baseOff = oy - top; baseHv = hv;
+      { const hf2 = 2 * Math.atan(Math.tan(vf / 2) * (w / h)); trailD = Math.max(7.0 / Math.tan(hf2 / 2), 3.6 / Math.tan(vf / 2)); }   // 生還の画面：盤全体が収まる距離
+      trail.applied = true;
     }
+    // ---- 生還の画面：真上近くから盤全体を見下ろし、たどった道の足跡を一歩ずつ順に浮かび上がらせる ----
+    const trail = { on: false, k: 0, t0: 0, list: [], line: null, applied: false };
+    const TRAIL_ELEV = 72 * Math.PI / 180, trailTarget = new T.Vector3(-0.5, 0.2, -0.3), camLook = new T.Vector3();
+    let baseOff = 0, baseHv = 1, trailD = 12;
+    const TRAIL_STEP = 0.17, TRAIL_WAIT = 2.1;   // 1 歩ごとの間（秒）と、カメラが動いてから足跡が出始めるまで
+    function startTrail(list) {
+      trail.on = true; trail.t0 = performance.now() / 1000; trail.list = list.slice();
+      if (trail.line) { scene.remove(trail.line); trail.line.geometry.dispose(); }
+      const pts = [new T.Vector3().copy(footAt(null)).setY(TOPW + 0.03)];
+      list.forEach(({ code }) => { const p = footAt(code); p.y = TOPW + 0.03; pts.push(p); });
+      const g = new T.BufferGeometry().setFromPoints(pts);
+      trail.line = new T.Line(g, new T.LineDashedMaterial({ color: 0xf6e7bf, dashSize: 0.14, gapSize: 0.1, transparent: true, opacity: 0.75, depthWrite: false }));
+      trail.line.computeLineDistances(); g.setDrawRange(0, 0); trail.line.renderOrder = 5;
+      scene.add(trail.line);
+    }
+    function stopTrail() {
+      trail.on = false; trail.k = 0;
+      if (trail.line) { scene.remove(trail.line); trail.line.geometry.dispose(); trail.line = null; }
+      KEYS.forEach(k => { k.v.prints.idx.scale.set(1, 1, 1); k.v.prints.mid.scale.set(1, -1, 1); });
+    }
+    function animateTrail(ts, dt) {
+      if (!trail.on) return;
+      trail.k = Math.min(1, trail.k + dt / 2.4);
+      const n = Math.max(0, Math.min(trail.list.length, Math.floor((ts - trail.t0 - TRAIL_WAIT) / TRAIL_STEP) + 1));
+      const shown = new Set();
+      trail.list.slice(0, n).forEach(({ code, id }) => shown.add(code + ":" + id));
+      KEYS.forEach(k => ["idx", "mid"].forEach(id => {
+        const p = k.v.prints[id], on = shown.has(k.code + ":" + id);
+        p.visible = on;
+        const sc = on ? 1.22 : 1; p.scale.set(sc, id === "mid" ? -sc : sc, 1);   // 上から見ても分かるよう少し大きく
+      }));
+      if (trail.line) trail.line.geometry.setDrawRange(0, n > 0 ? n + 1 : 0);
+    }
+    // 共有用：いまの画面をそのまま 1 枚描いて返す（描いた直後でないと WebGL の絵は読めない）
+    function capture() { renderer.render(scene, camera); return renderer.domElement; }
     new ResizeObserver(resize).observe(board);
     resize();
 
@@ -2613,6 +2674,7 @@ body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
       emitters.length = 0;
       boomT = 0; boomLight.intensity = 0; shakeT = 0;
       rigS.init = false; rigS.fallT = 0; rigS.walk = null;
+      stopTrail();
       gateLift = 0; gateOpen = 0; setGate(0, 0);
       Object.values(feetS).forEach(f => { f.init = false; });
     }
@@ -2693,6 +2755,7 @@ body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
         q.sp.material.opacity = q.fire ? (1 - t) : Math.min(1, t * 4) * (1 - t) * 0.75;
       });
       stepRagdoll(dt);
+      animateTrail(ts, dt);
       debris.forEach(d => {
         if (d.life <= 0) { d.m.visible = false; return; }
         d.life -= dt;
@@ -2722,8 +2785,19 @@ body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
     }
     function resizeCam() {
       resize();
-      camera.position.set(camTarget.x, camTarget.y + Math.sin(ELEV) * camD, camTarget.z + Math.cos(ELEV) * camD);
-      camera.lookAt(camTarget);
+      const e = trail.k * trail.k * (3 - 2 * trail.k);   // 生還の画面へ移る度合い
+      const elev = ELEV + (TRAIL_ELEV - ELEV) * e, dist = camD + (trailD - camD) * e;
+      camLook.copy(camTarget).lerp(trailTarget, e);
+      camera.position.set(camLook.x, camLook.y + Math.sin(elev) * dist, camLook.z + Math.cos(elev) * dist);
+      camera.lookAt(camLook);
+      if (e > 0 || trail.applied) {
+        const hvK = baseHv + (H - baseHv) * e;
+        camera.aspect = W / hvK;
+        camera.setViewOffset(W, hvK, 0, baseOff * (1 - e) - H * 0.07 * e, W, H);   // 盤を少し下げ、上に「生還」の文字の場所を空ける
+        camera.updateProjectionMatrix();
+        scene.fog.near = dist * 1.05; scene.fog.far = dist * 2.6;
+        trail.applied = e > 0;
+      }
     }
 
     // ---- 人形の姿勢 ----
@@ -3010,7 +3084,7 @@ body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
     function setMarks(a, b) {
       [["idx", a], ["mid", b]].forEach(([id, m]) => { const sp = legsR[id].sp; if (sp.material.map) sp.material.map.dispose(); sp.material.map = markTex(m); sp.material.needsUpdate = true; });
     }
-    return { syncKey, keyAnim, explode, setLabels, setUiHidden, setMarks, reset, render, pickKey, setHover, canvas: renderer.domElement };
+    return { syncKey, keyAnim, explode, setLabels, setUiHidden, setMarks, startTrail, capture, reset, render, pickKey, setHover, canvas: renderer.domElement };
   })();
 
 
@@ -3483,6 +3557,7 @@ body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
     if (view) view.reset();
     ambMuffled(false, 0.8);
     hideResult();
+    trailSteps.length = 0;
     statusEl.querySelector(".dot").style.animation = "";
     document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.mines === mineTotal)));
     renderKeys(); renderHud(); showBest(); refreshStatus();
@@ -3653,7 +3728,9 @@ body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
   }
 
   // 踏んだ：結果はすぐ決まるが、音と数字は SUSPENSE_MS の沈黙のあとに返す
+  const trailSteps = [];   // たどった道（踏んだ順のキーと足）
   function land(k, s) {
+    trailSteps.push({ code: k.code, id: s.id });
     buzz(8);   // 指先に小さな手ごたえ（どのキーでも同じ。地雷かどうかは伝えない）
     stopDetector();
     const live = k.mine && !k.spent;
@@ -3782,7 +3859,7 @@ body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
     const isBest = !best || endTime < +best;
     if (isBest) { try { localStorage.setItem(bestKey(), String(Math.round(endTime))); } catch (e) {} }
     setStatus("win", `${t("win", { t: fmt(endTime), n: steps, b: isBest ? t("win_best") : "" })}${LANG === "ja" ? "　" : " — "}${t("again_kbd")}`);
-    showResult(isBest, best);
+    showSurvive(isBest);
     showBest();
     syncDanger();
     renderKeys(); renderHud();
@@ -3790,30 +3867,76 @@ body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
 
   // ---------- クリア後の結果：兵士が門を抜けて歩き出したころに、上に重ねて出す（後ろのゲーム画面は見えたまま） ----------
   const LEVEL_NAME = { 6: "lv_easy", 9: "lv_normal", 12: "lv_hard", 16: "lv_extreme" };
-  let resultTimer = null;
-  function showResult(isBest, prevBest) {
-    const flagged = KEYS.filter(k => k.flag), right = flagged.filter(k => k.mine).length;
-    $("res-sub").textContent = t("res_sub", { n: mineTotal, lv: t(LEVEL_NAME[mineTotal] || "lv_custom") });
-    $("res-time").textContent = fmt(endTime);
-    $("res-best").hidden = !isBest;
-    $("res-steps").textContent = t("n_steps", { n: steps });
-    $("res-stam").textContent = `${Math.max(0, Math.round(stamina))} / ${Math.round(tune.max)}`;
-    $("res-defuse").textContent = t("n_count", { n: KEYS.filter(k => k.disarmed).length });
-    $("res-flags").textContent = flagged.length ? `${right} / ${flagged.length}` : "—";
-    $("res-prev").textContent = prevBest ? t("n_sec", { t: fmt(+prevBest) }) : "—";
-    const id = gameId;
-    clearTimeout(resultTimer);
-    resultTimer = setTimeout(() => {
-      if (id !== gameId || state !== "won") return;
-      const r = $("result"); r.hidden = false;
-      document.body.classList.add("showresult");
-      requestAnimationFrame(() => requestAnimationFrame(() => r.classList.add("show")));
-    }, 2600);
+  // ---------- 生還：兵士が国境の向こうへ歩き去ったあと、真上から「たどった道」を見せ、静かに「生還」と出す ----------
+  let svTimers = [], svBest = false;
+  const SHARE_URL = /^https?:/.test(location.href) ? location.href.split("#")[0] : "https://xtoyox.github.io/yubisaki-ziraigen/";
+  function svStatsText() { return t("sv_stats", { t: fmt(endTime), n: steps, m: mineTotal, lv: t(LEVEL_NAME[mineTotal] || "lv_custom") }); }
+  function showSurvive(isBest) {
+    const id = gameId, later = (ms, fn) => svTimers.push(setTimeout(() => { if (id === gameId && state === "won") fn(); }, ms));
+    $("sv-stats").textContent = svStatsText();
+    $("sv-best").hidden = !isBest;
+    svBest = isBest;
+    $("sv-note").hidden = true;
+    const sv = $("survive");
+    later(3200, () => {   // 兵士が門を抜けたころ、カメラが上へ引いていく
+      document.body.classList.add("surviving");
+      sv.hidden = false; sv.classList.remove("s1", "s2");
+      if (view) view.startTrail(trailSteps);
+    });
+    const reveal = 3200 + 2100 + trailSteps.length * 170;
+    later(3200 + 1400, () => sv.classList.add("s1"));
+    later(Math.max(3200 + 3200, reveal + 600), () => sv.classList.add("s2"));
   }
   function hideResult() {
-    clearTimeout(resultTimer);
-    const r = $("result"); r.classList.remove("show"); r.hidden = true;
-    document.body.classList.remove("showresult");
+    svTimers.forEach(clearTimeout); svTimers = [];
+    const sv = $("survive"); sv.hidden = true; sv.classList.remove("s1", "s2");
+    document.body.classList.remove("surviving");
+  }
+  // 共有する画像：いまの盤（真上から見た軌跡）に、題と記録を重ねた 1200×675 の絵
+  function shareImage() {
+    const src = view.capture();
+    const W = 1200, H = 675, c = document.createElement("canvas"); c.width = W; c.height = H;
+    const g = c.getContext("2d");
+    const sc = Math.max(W / src.width, H / src.height), dw = src.width * sc, dh = src.height * sc;
+    g.drawImage(src, (W - dw) / 2, (H - dh) / 2, dw, dh);
+    let gr = g.createLinearGradient(0, 0, 0, H);
+    gr.addColorStop(0, "rgba(6,5,4,.7)"); gr.addColorStop(.3, "rgba(6,5,4,0)"); gr.addColorStop(.75, "rgba(6,5,4,0)"); gr.addColorStop(1, "rgba(6,5,4,.75)");
+    g.fillStyle = gr; g.fillRect(0, 0, W, H);
+    gr = g.createRadialGradient(W / 2, H / 2, H * .35, W / 2, H / 2, H * .9); gr.addColorStop(0, "rgba(0,0,0,0)"); gr.addColorStop(1, "rgba(0,0,0,.55)");
+    g.fillStyle = gr; g.fillRect(0, 0, W, H);
+    const spaced = (text, x, y, sp) => {   // 字間をあけて中央ぞろえで描く
+      const chars = [...text], ws = chars.map(ch => g.measureText(ch).width), total = ws.reduce((a, b) => a + b, 0) + sp * (chars.length - 1);
+      let cx = x - total / 2; chars.forEach((ch, i) => { g.fillText(ch, cx, y); cx += ws[i] + sp; });
+    };
+    g.textBaseline = "alphabetic"; g.textAlign = "left";
+    g.fillStyle = "#cfc6ae"; g.font = '500 17px "IBM Plex Mono", ui-monospace, monospace'; spaced(t("sv_sub").toUpperCase(), W / 2, 62, 6);
+    g.shadowColor = "rgba(0,0,0,.7)"; g.shadowBlur = 24;
+    g.fillStyle = "#f1e8d4"; g.font = `400 ${LANG === "ja" ? 104 : 72}px "Dela Gothic One", "Hiragino Sans", sans-serif`; spaced(t("sv_title"), W / 2, LANG === "ja" ? 170 : 150, LANG === "ja" ? 34 : 18);
+    g.shadowBlur = 10;
+    g.fillStyle = "#e3dbc6"; g.font = '500 20px "IBM Plex Mono", ui-monospace, monospace'; spaced(svStatsText() + (svBest ? (LANG === "ja" ? " ・ " : " · ") + t("sv_best") : ""), W / 2, LANG === "ja" ? 210 : 190, 2);
+    g.shadowBlur = 0;
+    g.font = '400 22px "Dela Gothic One", "Hiragino Sans", sans-serif'; g.fillStyle = "#f1e8d4"; g.textAlign = "left"; g.fillText(t("share_title"), 34, H - 30);
+    g.font = '500 15px "IBM Plex Mono", ui-monospace, monospace'; g.fillStyle = "#bfb7a2"; g.textAlign = "right"; g.fillText(SHARE_URL.replace(/^https?:\/\//, "").replace(/\/$/, ""), W - 34, H - 32);
+    return new Promise(res => c.toBlob(res, "image/png"));
+  }
+  async function shareToX() {
+    const text = t("share_text", { t: fmt(endTime), n: steps, m: mineTotal, lv: t(LEVEL_NAME[mineTotal] || "lv_custom") });
+    const intent = "https://x.com/intent/post?text=" + encodeURIComponent(text) + "&url=" + encodeURIComponent(SHARE_URL);
+    const sheet = TOUCH && navigator.canShare && navigator.share;
+    const win = sheet ? null : window.open("about:blank", "_blank");   // ポップアップを止められないよう、押した瞬間に開いておく
+    const blob = await shareImage();
+    if (!blob) { if (win) win.location.href = intent; return; }
+    const file = new File([blob], "yubisaki-survived.png", { type: "image/png" });
+    // スマホ：共有シートで画像と文をそのまま X へ（X を選ぶ）
+    if (sheet && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], text: text + "\n" + SHARE_URL }); return; }
+      catch (e) { if (e && e.name === "AbortError") return; }
+    }
+    // PC など：画像を保存し、X の投稿画面を開く（画像は自分で添付する）
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "yubisaki-survived.png";
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+    if (win) win.location.href = intent; else window.open(intent, "_blank");
+    const note = $("sv-note"); note.textContent = t("share_saved"); note.hidden = false;
   }
 
   function startHeart() {
@@ -4145,8 +4268,9 @@ body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
   });
   try { if (localStorage.getItem("ykj-labels") === "off") { bLbl.setAttribute("aria-pressed", "false"); if (view) view.setLabels(false); } } catch (e) {}
   if (PHONE) { bLbl.setAttribute("aria-pressed", "false"); if (view) view.setLabels(false); }   // スマホはキーの文字を出さない（寄った画面では足元の邪魔になる）
-  $("res-again").addEventListener("click", e => { e.currentTarget.blur(); pointerKey.clear(); newGame(); stage.focus({ preventScroll: true }); });
-  $("res-title").addEventListener("click", e => { e.currentTarget.blur(); showTitle(); });
+  $("sv-again").addEventListener("click", e => { e.currentTarget.blur(); pointerKey.clear(); newGame(); stage.focus({ preventScroll: true }); });
+  $("sv-title").addEventListener("click", e => { e.currentTarget.blur(); showTitle(); });
+  $("sv-share").addEventListener("click", e => { e.currentTarget.blur(); shareToX(); });
   {
     const menu = $("menu"), mb = $("btn-menu");
     const setMenu = open => { menu.hidden = !open; mb.setAttribute("aria-expanded", String(open)); };
