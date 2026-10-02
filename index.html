@@ -223,6 +223,7 @@ body.phone .ui-back{top:calc(6px + env(safe-area-inset-top,0px))}
 body.phone .fab-retry{display:none}
 body.phone.isdead .fab-retry{display:inline-flex}
 body.phone.noui .fab,body.phone.noui .menu{display:none !important}
+body.phone .menu [data-proxy="btn-labels"]{display:none}
 body.phone .result{top:calc(64px + env(safe-area-inset-top,0px))}
 body.phone.showresult .fab-flag{display:none}
 .tdots{position:fixed;inset:0;pointer-events:none;z-index:5}
@@ -962,7 +963,7 @@ body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
     scene.fog = new T.Fog(0x110e0b, 15, 37);
     const camera = new T.PerspectiveCamera(30, 2, 0.1, 150);
     const camTarget = PHONE ? new T.Vector3(-0.85, 0.3, -0.5) : new T.Vector3(TOUCH ? -0.6 : 0, 0.1, 0.3);   // スマホは遊ぶ 40 キーの真ん中を見る
-    const ELEV = (PHONE ? 60 : 38) * Math.PI / 180;   // 見下ろす角度（PC は奥の戦場も見えるよう浅め、スマホは押す場所が分かりやすいよう真上寄り）
+    const ELEV = (PHONE ? 56 : 38) * Math.PI / 180;   // 見下ろす角度（PC は奥の戦場も見えるよう浅め、スマホは押す場所が分かりやすいよう真上寄り）
 
     // ---- 寸法（1 = キー 1 個分、約 19mm） ----
     const CAP_H = 0.34, CAP_GAP = 0.1, TRAVEL = 0.13, TOP_INSET = 0.1;
@@ -2430,7 +2431,7 @@ body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
       const hv = Math.max(120, h - reserve - top - bottom);
       camera.aspect = w / hv;
       const vf = camera.fov * Math.PI / 180, hf = 2 * Math.atan(Math.tan(vf / 2) * camera.aspect);
-      camD = PHONE ? Math.max(6.1 / Math.tan(hf / 2), 2.75 / Math.tan(vf / 2))   // スマホ：遊ぶキーの範囲がちょうど収まる距離
+      camD = PHONE ? Math.max(3.9 / Math.tan(hf / 2), 1.7 / Math.tan(vf / 2))   // スマホ：兵士のまわり（左右 4 キーほど）だけを大きく映す
         : Math.max((TOUCH ? 6.9 : 10.6) / Math.tan(hf / 2), (TOUCH ? 3.0 : 4.3) / Math.tan(vf / 2));   // キーボードの左右に戦場が見える程度に引く
       scene.fog.near = camD * 1.05; scene.fog.far = camD * 2.6;   // 霧はカメラの距離に合わせる（縦長の画面でも手前が霞まない）
       // キーボードの手前の縁が文字の帯のすぐ上に来るよう、絵を下へずらす（空いた上の部分に奥の戦場が見える）
@@ -2440,10 +2441,8 @@ body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
       camera.updateProjectionMatrix();
       const py = v => (1 - v.project(camera).y) / 2 * hv;
       let oy;
-      if (PHONE) {   // 遊ぶキーの手前の縁と奥の縁の真ん中を、空いている範囲の真ん中に
-        const f2 = py(new T.Vector3(-0.85, 0, 1.6)), b2 = py(new T.Vector3(-0.85, TOPW, -2.5));
-        oy = (f2 + b2) / 2 - hv / 2;
-      } else {
+      if (PHONE) oy = 0;   // スマホ：カメラが見ている点（兵士の少し先）を、空いている範囲の真ん中に
+      else {
         const front = py(new T.Vector3(0, -0.05, 2.95)), back = py(new T.Vector3(0, 0.5, -2.95));
         oy = Math.min(front - (hv - Math.max(40, hv * 0.14)), back - Math.min(90, hv * 0.16));   // 下にも少し余白を残す
       }
@@ -2703,6 +2702,7 @@ body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
         if (d.m.position.y < fl) { d.m.position.y = fl; d.v.y *= -0.3; d.v.x *= 0.6; d.v.z *= 0.6; d.spin.multiplyScalar(0.5); }
       });
       // カメラ（爆発のときだけ揺らす）
+      if (PHONE) followCam(dt);
       resizeCam();
       if (shakeT > 0) {
         shakeT = Math.max(0, shakeT - dt);
@@ -2710,6 +2710,14 @@ body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
         camera.position.x += rnd(-a, a); camera.position.y += rnd(-a, a) * 0.6;
       }
       renderer.render(scene, camera);
+    }
+    // スマホ：カメラは兵士を追う。進む向き（右）を少し多めに見せ、盤の外を映しすぎないよう範囲を絞る
+    const camWant = new T.Vector3();
+    let camInit = false;
+    function followCam(dt) {
+      camWant.set(clamp(rigS.px + 0.9, -3.4, 3.6), 0.3, clamp(rigS.pz - 0.15, -1.45, 0.55));
+      if (!camInit || !rigS.init) { camTarget.copy(camWant); camInit = rigS.init; }
+      else camTarget.lerp(camWant, ease(rigS.walk ? 2.2 : 3.2, dt));
     }
     function resizeCam() {
       resize();
@@ -4135,6 +4143,7 @@ body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
     bLbl.blur(); stage.focus({ preventScroll: true });
   });
   try { if (localStorage.getItem("ykj-labels") === "off") { bLbl.setAttribute("aria-pressed", "false"); if (view) view.setLabels(false); } } catch (e) {}
+  if (PHONE) { bLbl.setAttribute("aria-pressed", "false"); if (view) view.setLabels(false); }   // スマホはキーの文字を出さない（寄った画面では足元の邪魔になる）
   $("res-again").addEventListener("click", e => { e.currentTarget.blur(); pointerKey.clear(); newGame(); stage.focus({ preventScroll: true }); });
   $("res-title").addEventListener("click", e => { e.currentTarget.blur(); showTitle(); });
   {
