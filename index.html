@@ -913,7 +913,8 @@ body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
     },
   };
   let LANG = (() => {
-    try { const s = localStorage.getItem("ykj-lang"); if (s && I18N[s]) return s; } catch (e) {}
+    // 自分で選んだ言語だけを覚える（前の版が端末の言語を自動で保存していた "ykj-lang" は使わない）
+    try { const s = localStorage.getItem("ykj-lang-picked"); if (s && I18N[s]) return s; } catch (e) {}
     return "en";   // はじめて開いたときは英語
   })();
   function t(key, p) {
@@ -4265,9 +4266,9 @@ body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
   syncTuneInputs(); renderTune();
 
   // ---------- ことばの切り替え ----------
-  function applyLang(lang) {
+  function applyLang(lang, picked) {
     LANG = I18N[lang] ? lang : "en";
-    try { localStorage.setItem("ykj-lang", LANG); } catch (e) {}
+    if (picked) { try { localStorage.setItem("ykj-lang-picked", LANG); } catch (e) {} }   // 保存するのは、言語を選んだときだけ
     document.documentElement.lang = LANG;
     document.body.dataset.lang = LANG;
     document.title = t("doc_title");
@@ -4284,7 +4285,7 @@ body.phone .lang{top:calc(8px + env(safe-area-inset-top,0px))}
     LANGS.forEach(([code, name]) => {
       const b = document.createElement("button");
       b.type = "button"; b.dataset.lang = code; b.textContent = name; b.lang = code;
-      b.addEventListener("click", () => { applyLang(code); list.hidden = true; cur.setAttribute("aria-expanded", "false"); });
+      b.addEventListener("click", () => { applyLang(code, true); list.hidden = true; cur.setAttribute("aria-expanded", "false"); });
       list.appendChild(b);
     });
     cur.addEventListener("click", () => { list.hidden = !list.hidden; cur.setAttribute("aria-expanded", String(!list.hidden)); });
